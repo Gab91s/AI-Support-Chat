@@ -1,45 +1,58 @@
 'use client'
 import { Box, Stack, TextField, Button } from "@mui/material";
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 
+// The component definition
 export default function Home() {
     const [messages, setMessages] = useState([
         {
             role: 'assistant',
             content: 'How are you?',
         },
-    ])
+    ]);
 
-    const [message, setMessage] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
+    const [message, setMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const sendMessage = async () => {
+    const messagesEndRef = useRef(null);
+    const textFieldRef = useRef(null); // Reference to the TextField
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const sendMessage = useCallback(async () => {
         if (!message.trim() || isLoading) return;
-    
+
         setIsLoading(true);
         const userMessage = { role: 'user', content: message };
-    
+
         setMessage('');
         setMessages((messages) => [
             ...messages,
             userMessage,
             { role: 'assistant', content: '' }
         ]);
-    
+
         try {
             const response = await fetch('/api', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify([...messages, userMessage]),
             });
-    
+
             if (!response.ok) {
                 throw new Error('Network response was not OK');
             }
-    
-            const responseData = await response.json(); // Parse the JSON response
+
+            const responseData = await response.json();
+
             setMessages((messages) => {
                 let lastMessage = messages[messages.length - 1];
                 let otherMessages = messages.slice(0, messages.length - 1);
@@ -55,16 +68,21 @@ export default function Home() {
                 { role: 'assistant', content: "I'm sorry, but I encountered an error. Please try again later." },
             ]);
         }
-    
+
         setIsLoading(false);
-    };    
+
+        // Focus the TextField once the bot responds, with a slight delay
+        setTimeout(() => {
+            textFieldRef.current?.focus();
+        }, 100); // Delay by 100ms to ensure the rendering is completed
+    }, [message, messages, isLoading]);
 
     const handleKeyPress = (event) => {
         if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault()
-            sendMessage()
-        } 
-    }
+            event.preventDefault();
+            sendMessage();
+        }
+    };
 
     return (
         <Box
@@ -106,6 +124,7 @@ export default function Home() {
                             </Box>
                         </Box>
                     ))}
+                    <div ref={messagesEndRef} />
                 </Stack>
                 <Stack direction="row" spacing={2}>
                     <TextField
@@ -115,6 +134,7 @@ export default function Home() {
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyPress={handleKeyPress}
                         disabled={isLoading}
+                        inputRef={textFieldRef} // Assign the ref to the TextField
                     />
                     <Button
                         variant="contained"
@@ -126,5 +146,8 @@ export default function Home() {
                 </Stack>
             </Stack>
         </Box>
-    )
+    );
 }
+
+// Assign a display name to the component
+Home.displayName = 'Home';
