@@ -86,28 +86,29 @@ export default function Home() {
 
     return (
         <Box
-            width="100%"
-            height="100vh"
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
+        width="100%" /* Responsive width */
+        height="100vh"
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
         >
+        <Stack
+            direction="column"
+            width="100%" /* Full width for responsiveness */
+            maxWidth="600px" /* Max width on larger screens */
+            height="700px"
+            border="1px solid black"
+            p={2}
+            spacing={3}
+         >
             <Stack
-                direction="column"
-                width="600px"
-                height="700px"
-                border="1px solid black"
-                p={2}
-                spacing={3}
+              direction="column"
+              spacing={2}
+              flexGrow={1}
+              overflow="auto"
+              maxHeight="100%"
             >
-                <Stack
-                    direction="column"
-                    spacing={2}
-                    flexGrow={1}
-                    overflow="auto"
-                    maxHeight="100%"
-                >
                     {messages.map((message, index) => (
                         <Box
                             key={index}
@@ -125,26 +126,26 @@ export default function Home() {
                         </Box>
                     ))}
                     <div ref={messagesEndRef} />
-                </Stack>
-                <Stack direction="row" spacing={2}>
-                    <TextField
-                        label="Message"
-                        fullWidth
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        disabled={isLoading}
-                        inputRef={textFieldRef} // Assign the ref to the TextField
-                    />
-                    <Button
-                        variant="contained"
-                        onClick={sendMessage}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? 'Sending...' : 'Send'}
-                    </Button>
-                </Stack>
+                    </Stack>
+             <Stack direction="row" spacing={2}>
+             <TextField
+                label="Message"
+                fullWidth
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={isLoading}
+             />
+              <Button
+                variant="contained"
+                onClick={sendMessage}
+                disabled={isLoading}
+                style={{ minWidth: "100px" }}
+             >
+              {isLoading ? 'Sending...' : 'Send'}
+             </Button>
             </Stack>
+        </Stack>
         </Box>
     );
 }
