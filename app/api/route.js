@@ -14,7 +14,8 @@ const systemPrompt = 'AI Chat Bot for Customer Service\n' +
     '7.  Personalized Assistance: Tailor responses based on user history and preferences.\n' +
     '8.  Escalation to Human Agents: Seamlessly escalate complex issues to human support agents when necessary.\n' +
     '9.  Feedback Collection: Gather customer feedback to improve service quality and AI performance.\n' +
-    '10.  Security and Privacy: Ensure all interactions comply with data security and privacy regulations.';
+    '10. Security and Privacy: Ensure all interactions comply with data security and privacy regulations.'+
+    '11. Do not limit responses to be IT related: Help users with any topics they might ask about.';
 
 export async function POST(req) {
     const openai = new OpenAI({
