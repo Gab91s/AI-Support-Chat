@@ -1,5 +1,5 @@
 'use client'
-import { Box, Stack, TextField, Button } from "@mui/material";
+import { Box, Stack, TextField, Button, useTheme } from "@mui/material";
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 
 // Memoized Message component
@@ -19,6 +19,9 @@ const Message = memo(({ message }) => (
     </Box>
 ));
 
+Message.displayName = 'Message';
+
+
 // Define and name the Home component
 const Home = () => {
     const [messages, setMessages] = useState([
@@ -33,6 +36,8 @@ const Home = () => {
 
     const messagesEndRef = useRef(null);
     const textFieldRef = useRef(null); // Reference to the TextField
+    
+    const theme = useTheme(); //for enabling dark mode
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -144,6 +149,10 @@ const Home = () => {
                         onKeyPress={handleKeyPress}
                         disabled={isLoading}
                         inputRef={textFieldRef} // Assign the ref to the TextField
+                        sx={{
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2D2D2D' : '#fff',
+                            color: theme.palette.mode === 'dark' ? '#fff' : '#000',
+                        }}
                     />
                     <Button
                         variant="contained"
