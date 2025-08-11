@@ -34,10 +34,35 @@ const Message = memo(({ message }) => (
         justifyContent={message.role === 'assistant' ? 'flex-start' : 'flex-end'}
     >
         <Box
-            bgcolor={message.role === 'assistant' ? 'primary.main' : 'secondary.main'}
-            color="white"
-            borderRadius={16}
-            p={3}
+            // bgcolor={message.role === 'assistant' ? 'primary.main' : 'secondary.main'}
+            // color="white"
+            // borderRadius={16}
+            // p={3}
+            sx={(t) => {
+                const dark = t.palette.mode === 'dark';
+                const isAssistant = message.role === 'assistant';
+
+                // Subtle, OLED-friendly bubbles in dark; brand colors in light
+                const bg = isAssistant
+                ? (dark ? '#0f1720' : t.palette.primary.main)
+                : (dark ? '#14202a' : t.palette.secondary.main);
+
+                const color = dark ? t.palette.text.primary : '#fff';
+
+                return {
+                    bgcolor: bg,
+                    color,
+                    borderRadius: 3,
+                    px: 2,
+                    py: 1.5,
+                    maxWidth: '80%',
+                    // Shadows look muddy on phones in dark mode—dial them back
+                    boxShadow: dark ? 'none' : t.shadows[1],
+                    border: dark ? `1px solid ${t.palette.divider}` : 'none',
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                };
+            }}
         >
             {message.content}
         </Box>
@@ -136,23 +161,33 @@ const Home = () => {
     };
 
     return (
-        <Box
-            width="100%"
-            height="100vh"
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-        >
-            <Stack
-                direction="column"
-                width="100%" /* Responsive width */
-                maxWidth="600px" /* Max width on larger screens */
-                height="700px"
-                border="1px solid black"
-                p={2}
-                spacing={3}
-            >
+      <Box
+        width="100%"
+        minHeight="100dvh"
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        sx={{
+            bgcolor: (t) => t.palette.background.default,
+            color: (t) => t.palette.text.primary,
+            // iOS safe areas
+            pb: 'env(safe-area-inset-bottom)',
+            px: 'env(safe-area-inset-left)',
+        }}
+      >
+      <Stack
+        direction="column"
+        width="100%"
+        maxWidth="600px"
+        height={{ xs: '80dvh', sm: '700px' }} // responsive height
+        border="1px solid"
+        borderColor={(t) => t.palette.divider}
+        borderRadius={2}
+        p={2}
+        spacing={3}
+        sx={{ bgcolor: (t) => t.palette.background.paper }}
+      >
                 <Stack
                     direction="column"
                     spacing={2}

@@ -158,3 +158,43 @@ a:focus {
   }
 }
 
+/* ==== Dark Mode Variables & Overrides ==== */
+:root { color-scheme: light dark; }
+
+:root {
+  --bg: #ffffff;
+  --fg: #0c0c0d;
+  --muted: #6b7280;
+  --card: #f7f7f8;
+  --border: #e5e7eb;
+  --link: #1e40af;
+  --primary: #2563eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0e12;
+    --fg: #e5e7eb;
+    --muted: #9aa1ab;
+    --card: #12161b;
+    --border: #1f2937;
+    --link: #93c5fd;
+    --primary: #60a5fa;
+  }
+}
+
+/* ==== Accessibility & Contrast ==== */
+:where(button, a, input, textarea):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ==== Mobile-specific tweaks ==== */
+:root { padding-bottom: env(safe-area-inset-bottom); }
+header, footer {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+a, button { -webkit-tap-highlight-color: transparent; }
+
+
