@@ -1,3 +1,28 @@
+/*
+ * File: page.js
+ * Description: Frontend of the AI Chat Bot that works with route.js file to
+ * display responses from AI and provides a text box for the user to
+ * input messages to AI
+ *
+ * AI-Support-Chat
+ * Copyright (c) 2025 Gabrielle Saab
+ * Portions of this codebase were generated with the assistance of ChatGPT
+ * and have been reviewed and modified by the project author.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Project repository: https://github.com/Gab91s/AI-Support-Chat
+ */
+
 'use client'
 import { Box, Stack, TextField, Button, useTheme } from "@mui/material";
 import { useState, useEffect, useRef, useCallback, memo } from 'react';

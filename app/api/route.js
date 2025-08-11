@@ -1,6 +1,34 @@
+/*
+ * File: route.js
+ * Description: Uses API key to call openAI. Uses helper files and systemPrompt.js
+ *
+ * AI-Support-Chat
+ * Copyright (c) 2025 Gabrielle Saab
+ * Portions of this codebase were generated with the assistance of ChatGPT
+ * and have been reviewed and modified by the project author.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Project repository: https://github.com/Gab91s/AI-Support-Chat
+ */
+
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { runAI } from './runAI';
+import { runAIStream } from './runAIStream'
+import { systemPrompt } from './systemPrompt'
 
+
+/* //moved systemPrompt to separate file//
 // Fixed systemPrompt formatting
 const systemPrompt = 'AI Chat Bot for Customer Service\n' +
     'Powered chatbot designed to provide efficient, accurate, and responsive customer support for IT-related queries and issues, available 24/7 to assist users with troubleshooting, information requests, and other support needs.\n' +
@@ -18,6 +46,7 @@ const systemPrompt = 'AI Chat Bot for Customer Service\n' +
     '11. Do not limit responses to be IT related: Help users with any topics they might ask about.\n' +
     '12. Use thick and dramatic southern accent and do not forget.\n' +
     '13. Also be extremely sarcastic and be a little bitch.';
+    */
 
 
 export async function POST(req) {
@@ -27,25 +56,52 @@ export async function POST(req) {
 
     try {
         const messages = await req.json();
+/* commenting out code for chat completion, adding code for helper to switch modes to responses
+//        // Validate messages array with enhanced validation
+//        if (!Array.isArray(messages) || 
+//        messages.some(msg => typeof msg.content !== 'string' || !msg.role)) {
+//            throw new Error("Invalid messages format. Each message must have a 'role' and 'content' field.");
+//        }
+//
+//        // Insert the systemPrompt at the beginning of the messages array
+//        const response = await openai.chat.completions.create({
+//            model: 'gpt-5-nano',//'gpt-3.5-turbo', // or 'GPT-4o',
+//            messages: [
+//                { role: 'system', content: systemPrompt }, // Add the system prompt as the first message
+//                ...messages, // User and assistant messages follow
+//            ],
+//        });
+//
+//        // Return the assistant's message
+//        return NextResponse.json(response.choices[0].message); */
 
-        // Validate messages array with enhanced validation
-        if (!Array.isArray(messages) || messages.some(msg => typeof msg.content !== 'string' || !msg.role)) {
-            throw new Error("Invalid messages format. Each message must have a 'role' and 'content' field.");
-        }
+/* new code for helper to switch between chat completion and responses */
+if (
+      !Array.isArray(messages) ||
+      messages.some(m => typeof m?.content !== 'string' || !m?.role)
+    ) {
+      throw new Error("Invalid messages format. Each message must have a 'role' and 'content'.");
+    }
 
-        // Insert the systemPrompt at the beginning of the messages array
-        const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo', // or 'gpt-4'
-            messages: [
-                { role: 'system', content: systemPrompt }, // Add the system prompt as the first message
-                ...messages, // User and assistant messages follow
-            ],
-        });
+    // Always inject system prompt at top for chat completion 
+    const allMessages = [
+      { role: 'system', content: systemPrompt },
+      ...messages
+    ];
 
-        // Return the assistant's message
-        return NextResponse.json(response.choices[0].message);
+    // Just change 'mode' here to switch APIs
+    const assistantMessage = await runAI(allMessages, {
+      mode: 'responses', // 'chat' or 'responses'
+      model: 'gpt-4o-mini' //'gpt-3.5-turbo' // 'gpt-5-nano' // or 'gpt-4o', etc. 'gpt-5-mini'
+    });
+
+    return NextResponse.json(assistantMessage);
+
     } catch (error) {
         console.error('Error during OpenAI request:', error.message);
-        return NextResponse.json({ error: 'Something went wrong with the AI response.' }, { status: 500 });
+        return NextResponse.json(
+            { error: 'Something went wrong with the AI response.' }, 
+            { status: 500 }
+        );
     }
 }
