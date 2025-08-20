@@ -8,7 +8,11 @@
 
 import OpenAI from 'openai';
 import { Agent, setGlobalDispatcher } from 'undici'; // for the keepAliveDispatcher
-import { systemPrompt } from './systemPrompt'
+//import { systemPrompt } from './systemPrompt'
+import { aiConfig } from './_config/aiConfig';
+import { API_KEY_MAP } from './_config/keyMap'
+import { getApiKeyForPrompt } from './_config/keyMap.js';
+
 
 
 // keep-alive for faster back-to-back calls
@@ -18,7 +22,15 @@ setGlobalDispatcher(new Agent({
   connections: 100,
 }));
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const systemPrompt = aiConfig.systemPrompt;
+// original, before adding keyMap // const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// use keyMap.js
+// const promptName = aiConfig.systemPrompt;
+// const { apiKey } = API_KEY_MAP[promptName] || {};
+// const openai = new OpenAI({ apiKey });
+const selectedPromptKey = aiConfig.systePrompt;
+const openai = new OpenAI({ apiKey: getApiKeyForPrompt(selectedPromptKey) });
+
 
 
 function toResponsesParts(role, content) {
@@ -170,6 +182,9 @@ export async function runAI(messages, { mode = 'responses', model = 'gpt-5-nano'
         const resp = await openai.chat.completions.create(params);
         console.timeEnd('chattime');
         console.log("Resolved model (Chat):", resp.model); // ✅ log model version
+        console.log("Received systemPrompt:", systemPrompt);
+        console.log("Received model:", model);
+
         return resp.choices[0].message;
       } finally { done(); }
     }
@@ -193,6 +208,7 @@ export async function runAI(messages, { mode = 'responses', model = 'gpt-5-nano'
         const resp = await openai.responses.create(params);
         console.timeEnd('responsestime');
         console.log("Resolved model (Responses):", resp.model); // ✅ log model version
+        console.log("Received systemPrompt:", systemPrompt);
         return { role: 'assistant', content: resp.output_text ?? '' };
     } finally { done(); }
   }

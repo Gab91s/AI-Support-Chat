@@ -26,7 +26,13 @@
 'use client'
 import { Box, Stack, TextField, Button, useTheme } from "@mui/material";
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import ModelControls from './modelControls'; 
+import ChatWidget from '../components/ChatWidget';
+import { GREETING_MAP } from './api/_config/greetingsMap';
+import { aiConfig } from './api/_config/aiConfig';
 
+
+const greeting = GREETING_MAP[aiConfig.systemPrompt];
 // Memoized Message component
 const Message = memo(({ message }) => (
     <Box
@@ -77,7 +83,7 @@ const Home = () => {
     const [messages, setMessages] = useState([
         {
             role: 'assistant',
-            content: 'How are you?',
+            content: greeting,
         },
     ]);
 
@@ -176,6 +182,10 @@ const Home = () => {
             px: 'env(safe-area-inset-left)',
         }}
       >
+
+      {/* <Box>
+      <ModelControls />
+      </Box> */}
       <Stack
         direction="column"
         width="100%"

@@ -25,7 +25,11 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { runAI } from './runAI';
 import { runAIStream } from './runAIStream'
-import { systemPrompt } from './systemPrompt'
+//import { systemPrompt } from './systemPrompt'
+import { PROMPT_MAP, aiConfig } from './_config/aiConfig.js'; // <-- add this import
+//import { supportPrompt, fredPrompt } from './_config/systemPromptVariants'; // create this file
+import { API_KEY_MAP } from './_config/keyMap'
+//import { getApiKeyForPrompt } from './_config/keyMap.js';
 
 
 /* //moved systemPrompt to separate file//
@@ -48,14 +52,18 @@ const systemPrompt = 'AI Chat Bot for Customer Service\n' +
     '13. Also be extremely sarcastic and be a little bitch.';
     */
 
-
-export async function POST(req) {
-    const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-    });
+//funtion that calls openAI api
+export async function POST(req) { 
+    // const openai = new OpenAI({
+    //     apiKey: process.env.OPENAI_API_KEY,
+    // });
+    const promptName = aiConfig.systemPrompt;
+    const { apiKey } = API_KEY_MAP[promptName] || {};
+    const openai = new OpenAI({ apiKey });
 
     try {
-        const messages = await req.json();
+        const messages = await req.json(); //declare messares 
+
 /* commenting out code for chat completion, adding code for helper to switch modes to responses
 //        // Validate messages array with enhanced validation
 //        if (!Array.isArray(messages) || 
@@ -84,15 +92,18 @@ if (
     }
 
     // Always inject system prompt at top for chat completion 
+    // Resolve the active prompt text from the key in aiConfig
+    const activePromptText = PROMPT_MAP[aiConfig.systemPrompt];
+
     const allMessages = [
-      { role: 'system', content: systemPrompt },
+      { role: 'system', content: activePromptText },
       ...messages
     ];
 
     // Just change 'mode' here to switch APIs
     const assistantMessage = await runAI(allMessages, {
-      mode: 'responses', // 'chat' or 'responses'
-      model: 'gpt-4o-mini' //'gpt-3.5-turbo' // 'gpt-5-nano' // or 'gpt-4o', etc. 'gpt-5-mini'
+      mode: aiConfig.mode, //'responses', // 'chat' or 'responses'
+      model: aiConfig.model, //'gpt-4o-mini' //'gpt-3.5-turbo' // 'gpt-5-nano' // or 'gpt-4o', etc. 'gpt-5-mini'
     });
 
     return NextResponse.json(assistantMessage);
